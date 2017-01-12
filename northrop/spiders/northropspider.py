@@ -48,6 +48,7 @@ class NorthropSpider(scrapy.Spider):
 
     def parse_items(self, response):
         data = json.loads(response.body)
+        print data
         # scrape data
         for item in data['requisitionList']:
             yield item
