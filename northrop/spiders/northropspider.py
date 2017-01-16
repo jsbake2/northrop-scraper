@@ -1,5 +1,8 @@
 import json
 import scrapy
+from scrapy.http.request import Request
+from scrapy.selector import Selector
+from northrop.items import NorthropItem
 
 
 class NorthropSpider(scrapy.Spider):
@@ -31,6 +34,18 @@ class NorthropSpider(scrapy.Spider):
         'sortingSelection': {'ascendingSortingOrder': 'false',
                              'sortBySelectionParam': '3'}}
 
+
+    def parse_details(self, response):
+      sel = Selector(response)
+      job = sel.xpath('//*[@id="ngc-career"]')
+      item = NorthropItem()
+      # Populate job fields
+      item['description'] = job.xpath('//*[@id="initialHistory"]').extract()
+      item['page_url'] = response.url
+
+      return item
+
+
     def parse(self, response):
         # we got cookies from first start url now lets request into the search api
         # copy base form for the first request
@@ -48,10 +63,10 @@ class NorthropSpider(scrapy.Spider):
 
     def parse_items(self, response):
         data = json.loads(response.body)
-        print data
         # scrape data
         for item in data['requisitionList']:
-            yield item
+            yield Request(url='https://ngc.taleo.net/careersection/ngc_pro/jobdetail.ftl?job='+item[u'jobId'], callback=self.parse_details)
+            #yield item
 
         # next page
         # get our form back and update the page number in it
