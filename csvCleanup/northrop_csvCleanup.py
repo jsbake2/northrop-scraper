@@ -11,6 +11,8 @@ import clearances
 from clearances import clearance as clear
 from sys import argv
 import datetime
+import cleanTags
+from cleanTags import cleanTag
 #  clearance,description,title,reqid,loclink,location,clearanceAndJunk
 #csvFile = 'csvWork.csv'
 logFile = 'logfile'
@@ -90,7 +92,7 @@ with open(csvFile, 'rb') as mycsv:
       page_url = cleanupAsciiEncoding(page_url)
       #Append the reqId to this link:
       appUrl = 'https://ngc.taleo.net/careersection/application.jss?type=1&lang=en&portal=2160420105&reqNo='+req
-      
+      desc = cleanTag(desc)
       title = re.sub('^\s+|\s+$', '',title)
       if re.match('location', loc):
         LOG.write("Skipping header field")
